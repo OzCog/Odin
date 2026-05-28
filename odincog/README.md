@@ -66,6 +66,46 @@ odincog/
 ├── persist/
 │   └── file/           # File persistence
 │       └── persist.odin
+├── arena/              # Phase II: Game Loop Arena
+│   ├── loop/           # Fixed timestep game loop
+│   │   └── game_loop.odin
+│   ├── memory/         # Arena allocators
+│   │   └── arena.odin
+│   ├── state/          # World state management
+│   │   └── world_state.odin
+│   └── sensors/        # Observation system
+│       └── sensors.odin
+├── active_inference/   # Phase II: Active Inference Engine
+│   ├── model/          # Generative model
+│   │   └── generative_model.odin
+│   ├── inference/      # Free energy minimization
+│   │   └── free_energy.odin
+│   ├── agent/          # Active inference agent
+│   │   └── active_agent.odin
+│   └── policy/         # Policy inference
+│       └── policy_inference.odin
+├── meta/               # Phase II: Self-Reflective Code
+│   ├── types/          # Code atom types
+│   │   └── code_types.odin
+│   ├── reflect/        # Code introspection
+│   │   └── code_reflect.odin
+│   ├── patterns/       # Meta-patterns
+│   │   └── meta_patterns.odin
+│   └── rules/          # Meta-rules
+│       └── meta_rules.odin
+├── niche/              # Phase II: Niche Construction
+│   ├── construction/   # Affordances and scaffolds
+│   │   └── niche_construction.odin
+│   ├── evolution/      # Coevolution dynamics
+│   │   └── coevolution.odin
+│   └── stigmergy/      # Stigmergic traces
+│       └── stigmergy.odin
+├── systems/            # Phase II: Integrated Systems
+│   ├── cycle/          # Cognitive cycle
+│   │   ├── cognitive_cycle.odin
+│   │   └── tick.odin
+│   └── goals/          # Goal system
+│       └── goal_system.odin
 └── tests/              # Test suite
     └── tests.odin
 ```
@@ -171,6 +211,93 @@ OdinCog leverages Odin's strengths for a high-performance cognitive architecture
 3. **No Hidden Control Flow**: Explicit error handling and control
 4. **Compile-Time Safety**: Strong typing with discriminated unions
 
+## Phase II: AIGLA (Active Inference Game Loop Agent) ✅
+
+OdinCog Phase II transforms the cognitive architecture into a self-modifying, active inference-based system where:
+- The **entire AtomSpace** is the agent's "world state"
+- **Active inference** replaces hand-coded control loops
+- A **game loop arena** provides deterministic, tick-based execution
+- **Niche construction** allows the agent to modify its own environment
+
+### AIGLA Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                        ACTIVE INFERENCE GAME LOOP                        │
+│  ┌─────────────┐    ┌──────────────┐    ┌─────────────┐    ┌─────────┐ │
+│  │   OBSERVE   │───▶│   PREDICT    │───▶│    ACT      │───▶│ MUTATE  │ │
+│  │  (Sensors)  │    │ (Generative) │    │  (Policy)   │    │ (Arena) │ │
+│  └─────────────┘    └──────────────┘    └─────────────┘    └─────────┘ │
+│        ▲                                                        │       │
+│        └────────────────── WORLD STATE ◀────────────────────────┘       │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+### Phase II Components
+
+#### Arena Architecture (`arena/`)
+- **Game Loop** (`loop/game_loop.odin`): Fixed timestep execution with 7 phases
+- **Arena Allocator** (`memory/arena.odin`): Zero-cost per-frame allocations
+- **World State** (`state/world_state.odin`): Immutable snapshots with transactions
+- **Sensors** (`sensors/sensors.odin`): AtomSpace delta and external input sensors
+
+#### Active Inference Engine (`active_inference/`)
+- **Generative Model** (`model/generative_model.odin`): Belief states and predictions
+- **Free Energy** (`inference/free_energy.odin`): Variational free energy minimization
+- **Active Agent** (`agent/active_agent.odin`): Full active inference agent
+- **Policy Inference** (`policy/policy_inference.odin`): Policy as inference
+
+#### Self-Reflective Code Atoms (`meta/`)
+- **Code Types** (`types/code_types.odin`): PROCEDURE_NODE, MODULE_NODE, etc.
+- **Code Mirror** (`reflect/code_reflect.odin`): Parse codebase into AtomSpace
+- **Meta-Patterns** (`patterns/meta_patterns.odin`): Patterns over code structure
+- **Meta-Rules** (`rules/meta_rules.odin`): Self-modification with sandboxing
+
+#### Niche Construction (`niche/`)
+- **Construction** (`construction/niche_construction.odin`): Affordances and scaffolds
+- **Coevolution** (`evolution/coevolution.odin`): Fitness landscapes and stability
+- **Stigmergy** (`stigmergy/stigmergy.odin`): Pheromone-like attention traces
+
+#### Integrated Systems (`systems/`)
+- **Cognitive Cycle** (`cycle/cognitive_cycle.odin`): Unified integration
+- **Tick Function** (`cycle/tick.odin`): Observe→Predict→Infer→Act→Learn→Attend→Construct
+- **Goal System** (`goals/goal_system.odin`): Goals as preferred observations
+
+### Cognitive Tick
+
+```odin
+cognitive_tick :: proc(cycle: ^CognitiveCycle) {
+    // 1. OBSERVE - Gather sensory input
+    observe(cycle)
+    
+    // 2. PREDICT - Generate predictions from model
+    predict(cycle)
+    
+    // 3. INFER - Update beliefs (minimize free energy)
+    infer(cycle)
+    
+    // 4. ACT - Select and execute policy
+    act(cycle)
+    
+    // 5. LEARN - Update model parameters
+    learn(cycle)
+    
+    // 6. ATTEND - ECAN cycle
+    attend(cycle)
+    
+    // 7. CONSTRUCT - Niche construction
+    construct(cycle)
+}
+```
+
+### Design Principles
+
+1. **Everything is an Atom** — Code, data, beliefs, preferences, policies all live in AtomSpace
+2. **Active Inference** — Principled free energy minimization replaces ad-hoc control
+3. **Game Loop Determinism** — Fixed timestep enables reproducible behavior
+4. **Arena Allocation** — Predictable memory patterns with zero per-tick cost
+5. **Niche Construction** — Agent shapes environment, which shapes agent
+
 ## Comparison with OpenCog C++
 
 | Feature | OpenCog C++ | OdinCog |
@@ -180,6 +307,10 @@ OdinCog leverages Odin's strengths for a high-performance cognitive architecture
 | PLN | ✅ | ✅ (Core formulas) |
 | URE | ✅ | ✅ |
 | ECAN | ✅ | ✅ |
+| Active Inference | ❌ | ✅ |
+| Game Loop Arena | ❌ | ✅ |
+| Code Self-Reflection | ❌ | ✅ |
+| Niche Construction | ❌ | ✅ |
 | MOSES | ✅ | 🔜 Planned |
 | NLP Pipeline | ✅ | 🔜 Planned |
 | Distributed | ✅ | 🔜 Planned |
